@@ -1,0 +1,16 @@
+project:
+  name: AetherHound
+  version: 0.1
+
+mode:
+  type: simulation
+
+signal:
+  sample_rate: 1000000
+  center_frequency: 100000000
+
+detection:
+  threshold: 0.5
+
+logging:
+  file: logs/events.log
