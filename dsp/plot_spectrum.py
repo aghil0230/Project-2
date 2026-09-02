@@ -6,6 +6,9 @@ from fft_analysis import calculate_fft
 
 SAMPLE_RATE = 1000
 
+ANOMALY_LOW = 180
+ANOMALY_HIGH = 220
+
 
 # Load signal data
 with open("../data/samples/signal_samples.json", "r") as file:
@@ -44,6 +47,15 @@ plt.plot(
 )
 
 
+# Highlight anomaly detection band
+plt.axvspan(
+    ANOMALY_LOW,
+    ANOMALY_HIGH,
+    alpha=0.2,
+    label="Anomaly Detection Band"
+)
+
+
 plt.xlabel("Frequency (Hz)")
 plt.ylabel("Magnitude")
 
@@ -64,6 +76,4 @@ plt.savefig(
 
 
 print("Frequency spectrum saved.")
-print(
-    "File: ../data/processed/frequency_spectrum.png"
-)
+print("File: ../data/processed/frequency_spectrum.png")
