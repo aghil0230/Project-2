@@ -1,21 +1,53 @@
 import json
+import os
 
 import numpy as np
+import yaml
 
 from fft_analysis import calculate_fft
 
 
-SAMPLE_RATE = 1000
+# --------------------------------------------------
+# Load configuration
+# --------------------------------------------------
 
-# Frequency band used to measure abnormal energy
-ANOMALY_LOW = 180
-ANOMALY_HIGH = 220
+BASE_DIR = os.path.dirname(
+    os.path.dirname(os.path.abspath(__file__))
+)
 
+CONFIG_FILE = os.path.join(
+    BASE_DIR,
+    "config",
+    "config.yaml"
+)
+
+
+with open(CONFIG_FILE, "r") as file:
+    config = yaml.safe_load(file)
+
+
+# --------------------------------------------------
+# Detection configuration
+# --------------------------------------------------
+
+SAMPLE_RATE = config["signal"]["sample_rate"]
+
+ANOMALY_LOW = config["detection"]["frequency_band"]["low"]
+
+ANOMALY_HIGH = config["detection"]["frequency_band"]["high"]
+
+DETECTION_THRESHOLD = config["detection"]["threshold_percent"]
+
+
+# --------------------------------------------------
+# Frequency band analysis
+# --------------------------------------------------
 
 def analyze_frequency_band(signal):
+
     """
     Calculate the amount of energy present
-    inside the selected frequency band.
+    inside the configured frequency band.
     """
 
     frequencies, magnitude = calculate_fft(
@@ -40,9 +72,15 @@ def analyze_frequency_band(signal):
     }
 
 
+# --------------------------------------------------
+# Compare baseline and test signals
+# --------------------------------------------------
+
 def compare_signals(normal_signal, test_signal):
+
     """
-    Compare a test signal against the normal baseline.
+    Compare a test signal against the
+    normal baseline.
     """
 
     normal = analyze_frequency_band(
@@ -59,9 +97,13 @@ def compare_signals(normal_signal, test_signal):
         test["band_energy"] - baseline
     )
 
-    percentage_change = (
-        difference / baseline
-    ) * 100
+    if baseline == 0:
+        percentage_change = 0
+
+    else:
+        percentage_change = (
+            difference / baseline
+        ) * 100
 
     return (
         baseline,
@@ -70,24 +112,45 @@ def compare_signals(normal_signal, test_signal):
     )
 
 
+# --------------------------------------------------
+# Standalone detector
+# --------------------------------------------------
+
 if __name__ == "__main__":
 
     print("=" * 50)
     print("     AetherHound Frequency Detector")
     print("=" * 50)
 
-    # Load signals
-    with open(
-        "../data/samples/signal_samples.json",
-        "r"
-    ) as file:
+    print()
+    print("Configuration loaded")
+    print(
+        f"Frequency Band : "
+        f"{ANOMALY_LOW}-{ANOMALY_HIGH} Hz"
+    )
+    print(
+        f"Threshold      : "
+        f"{DETECTION_THRESHOLD}%"
+    )
 
+    # Load signals
+
+    signal_file = os.path.join(
+        BASE_DIR,
+        "data",
+        "samples",
+        "signal_samples.json"
+    )
+
+    with open(signal_file, "r") as file:
         data = json.load(file)
 
     normal_signal = data["normal_signal"]
+
     anomaly_signal = data["anomaly_signal"]
 
     # Compare signals
+
     baseline, test_energy, change = compare_signals(
         normal_signal,
         anomaly_signal
@@ -122,7 +185,7 @@ if __name__ == "__main__":
     print("\nDetection Result")
     print("--------------------")
 
-    if change > 20:
+    if change > DETECTION_THRESHOLD:
 
         print("⚠ ANOMALY DETECTED")
 

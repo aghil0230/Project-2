@@ -1,16 +1,19 @@
 project:
   name: AetherHound
-  version: 0.1
+  version: 0.2
 
 mode:
   type: simulation
 
 signal:
-  sample_rate: 1000000
+  sample_rate: 1000
   center_frequency: 100000000
 
 detection:
-  threshold: 0.5
+  frequency_band:
+    low: 180
+    high: 220
+  threshold_percent: 20
 
 logging:
   file: logs/events.log
