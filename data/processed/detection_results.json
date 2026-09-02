@@ -1,7 +1,13 @@
 {
-    "timestamp": "2026-08-12T21:25:24.090781",
+    "timestamp": "2026-09-02T18:40:29.197803",
+    "frequency_band": {
+        "low_hz": 180,
+        "high_hz": 220
+    },
+    "detection_threshold_percent": 20,
     "baseline_energy": 127.19543965378564,
     "test_energy": 31466.075197895032,
     "energy_change_percent": 24638.36741595675,
-    "result": "ANOMALY"
+    "result": "ANOMALY",
+    "reason": "Energy increased by 24638.37% within the monitored frequency band."
 }
